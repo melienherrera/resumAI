@@ -3,6 +3,7 @@ from langflow.load import run_flow_from_json
 import tempfile
 import os
 from dotenv import load_dotenv
+import requests
 
 # Load env vars
 load_dotenv()
@@ -96,18 +97,39 @@ TWEAKS = {
   }
 }
 
+def run_langflow_api(input_value):
+    url = "http://127.0.0.1:7860/api/v1/run/625d565a-9e49-4cc5-8799-260cb97a31c0"  # Your Langflow flow endpoint
+    payload = {
+        "input_value": input_value,
+        "output_type": "chat",
+        "input_type": "chat",
+        "File-zIfjh": {
+            "path": f"{temp_file_path}",
+            "silent_errors": False
+        }
+    }
+    headers = {
+        "Content-Type": "application/json"
+    }
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return {"error": f"API request error: {e}"}
+    except ValueError as e:
+        return {"error": f"Response parsing error: {e}"}
+
 # Submit
 if st.button("Submit"):
   st.write(f"Your desired role is: {desired_role}") 
   st.write(f"Thank you for submitting the form 🙏") 
   
   with st.spinner('Loading your results...'):
-    result = run_flow_from_json(flow=langflow_json,
-                input_value=f"{desired_role}",
-                fallback_to_env_vars=True, # False by default
-                tweaks=TWEAKS)
-
-  message = result[0].outputs[0].results['message'].data['text']
-  st.write(message)
+    result = run_langflow_api(desired_role)
+    if "error" in result:
+        st.error(result["error"])
+    else:
+        st.write(result["outputs"][0]["outputs"][0]["results"]["message"]["data"]["text"])
 
 
