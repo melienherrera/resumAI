@@ -11,3 +11,9 @@ __pycache__/
 
 # Ignore .DS_Store
 .DS_Store
+
+# Local files
+.venv/
+postings.csv
+resum_ai_bedrock/
+resumes/

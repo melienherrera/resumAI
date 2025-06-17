@@ -39,7 +39,6 @@ current_dir = os.path.dirname(__file__)
 
 # Construct the file path 
 resume_image = os.path.join(current_dir, 'resume.png')
-langflow_json = os.path.join(current_dir, 'Resume Assistant.json')
 
 # Title of the app
 # Center the title, header, image, and input form
@@ -63,39 +62,6 @@ if uploaded_file is not None:
         temp_file.write(uploaded_file.getvalue())
         temp_file_path = temp_file.name
 
-# Langflow Implementation
-TWEAKS = {
-  "ParseData-EA01z": {},
-  "Prompt-cwII3": {
-  },
-  "ChatOutput-T2xaq": {},
-  "OpenAIEmbeddings-AGnvK": {
-    "openai_api_key": f"{openai_api_key}",
-  },
-  "OpenAIModel-GM3Ha": {
-    "openai_api_key": f"{openai_api_key}",
-  },
-  "File-S8g3y": {  
-    "path": f"{temp_file_path}",
-    "silent_errors": False
-  },
-  "ParseData-Rt5pZ": {},
-  "ChatInput-ZffxB": {
-      "input_value": f"{desired_role}",
-  },
-  "AstraDB-T7QLI": {
-      "api_endpoint": f"{astra_endpoint}",
-      "token": f"{astra_db_token}",
-       "collection_name": "job_listings",
-      "embedding_choice": "Astra Vectorize",
-      "embedding_provider": "OpenAI",
-      "model": "text-embedding-3-small",
-  },
-  "Prompt-qGHGy": {},
-  "OpenAIModel-umK6j": {
-    "openai_api_key": f"{openai_api_key}",
-  }
-}
 
 def run_langflow_api(input_value):
     url = "http://127.0.0.1:7860/api/v1/run/625d565a-9e49-4cc5-8799-260cb97a31c0"  # Your Langflow flow endpoint
@@ -103,7 +69,7 @@ def run_langflow_api(input_value):
         "input_value": input_value,
         "output_type": "chat",
         "input_type": "chat",
-        "File-zIfjh": {
+        "File-0Pm7f": {
             "path": f"{temp_file_path}",
             "silent_errors": False
         }
@@ -122,14 +88,13 @@ def run_langflow_api(input_value):
 
 # Submit
 if st.button("Submit"):
+  
   st.write(f"Your desired role is: {desired_role}") 
   st.write(f"Thank you for submitting the form 🙏") 
-  
+
   with st.spinner('Loading your results...'):
     result = run_langflow_api(desired_role)
     if "error" in result:
         st.error(result["error"])
     else:
-        st.write(result["outputs"][0]["outputs"][0]["results"]["message"]["data"]["text"])
-
-
+      st.write(result["outputs"][0]["outputs"][0]["results"]["message"]["data"]["text"])
